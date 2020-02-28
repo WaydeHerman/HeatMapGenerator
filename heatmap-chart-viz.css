@@ -1,0 +1,44 @@
+.heatmap-chart-viz {
+  font-family: "Nunito", sans-serif;
+  font-size: 1em;
+}
+
+.heatmap-chart-viz * {
+  box-sizing: border-box;
+}
+
+.heatmap-chart-viz .tick > line {
+  stroke-width: 0px;
+}
+
+.heatmap-chart-viz .value-label {
+  font-weight: bold;
+  text-anchor: middle;
+}
+
+.axis-label {
+  text-anchor: middle;
+  font-size: 1em;
+}
+
+.heatmap-chart-viz .chart-tooltip {
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  padding: 0.25em 0.5em;
+  border-width: 2px;
+  border-style: solid;
+  background: rgba(255, 255, 255, 0.95);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.heatmap-chart-viz .chart-tooltip .tooltip-x-label,
+.heatmap-chart-viz .chart-tooltip .tooltip-y-label {
+  color: #000;
+}
+
+.heatmap-chart-viz .chart-tooltip .tooltip-value {
+  color: #a6a6a6;
+}
