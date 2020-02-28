@@ -30,7 +30,7 @@ function heatmapChartViz(option) {
   const showValue = option.showValue;
 
   console.log(option);
-  console.log("showValue", showValue);
+  console.log("positionLegend", positionLegend);
 
   // Process data
   option.data.forEach(d => {
@@ -90,22 +90,22 @@ function heatmapChartViz(option) {
     return d.key;
   });
 
-  var margin = { top: 10, right: 50, bottom: 50, left: 30 };
-  svg_width = 700;
-  svg_height = 700;
+  var margin = { top: 50, right: 50, bottom: 50, left: 50 };
+  svg_width = 600;
+  svg_height = 300;
 
   // Build Scales:
   var x = d3
     .scaleBand()
-    .range([margin.left, svg_width - margin.right - margin.left])
-    .domain(xGroups)
-    .padding(0.01);
+    .range([0, svg_width - margin.right - margin.left])
+    .domain(xGroups);
+  //.padding(0.01);
 
   var y = d3
     .scaleBand()
-    .range([svg_height - margin.top - margin.bottom, margin.bottom])
-    .domain(yGroups)
-    .padding(0.01);
+    .range([svg_height - margin.top - margin.bottom, 0])
+    .domain(yGroups);
+  //.padding(0.01);
 
   var colorScale = d3
     .scaleLinear()
@@ -171,6 +171,7 @@ function heatmapChartViz(option) {
           .attr("y", function(d) {
             return y(d.key) + y.bandwidth() / 2;
           })
+          .attr("dy", "0.5em")
           .text(function(d) {
             return formatNumber(d.value);
           })
@@ -189,7 +190,7 @@ function heatmapChartViz(option) {
     container
       .append("g")
       .attr("class", "y-axis")
-      .attr("transform", "translate(" + margin.left + ",0)")
+      .attr("transform", "translate(0,0)")
       .call(d3.axisLeft(y));
 
     container
@@ -287,19 +288,19 @@ function heatmapChartViz(option) {
 
   // Render legend
   if (positionLegend === "top" || positionLegend === "bottom") {
-    var legendWidth = svg_width - margin.left - 2 * margin.right;
+    var legendWidth = svg_width - margin.left - margin.right;
 
     var legendSVG = legendContainer
       .append("svg")
       .attr("width", svg_width)
-      .attr("height", 50)
+      .attr("height", 60)
       .append("g")
-      .attr("transform", "translate(" + (margin.left + margin.right) + ",0)")
+      .attr("transform", "translate(" + margin.left + ",0)")
       .attr("class", "legend-container");
 
     var legendColorScale = d3
       .scaleLinear()
-      .domain([0, legendWidth])
+      .domain([margin.left, legendWidth - margin.right])
       .interpolate(d3.interpolateHcl)
       .range([d3.rgb(fillColorStart), d3.rgb(fillColorFinish)]);
 
@@ -314,12 +315,48 @@ function heatmapChartViz(option) {
       .attr("x", function(d, i) {
         return i;
       })
-      .attr("y", 0)
+      .attr("y", 10)
       .attr("height", 30)
       .attr("width", 1)
       .style("fill", function(d, i) {
         return legendColorScale(d);
       });
+  } else {
+    if (positionLegend === "right") {
+      var legendHeight = svg_height - margin.top - margin.bottom;
+
+      var legendSVG = container
+        .append("svg")
+        .attr("height", svg_height)
+        .attr("width", 50)
+        .append("g")
+        .attr("transform", "translate(0," + margin.top + ")")
+        .attr("class", "legend-container");
+
+      var legendColorScale = d3
+        .scaleLinear()
+        .domain([legendHeight, 0])
+        .interpolate(d3.interpolateHcl)
+        .range([d3.rgb(fillColorStart), d3.rgb(fillColorFinish)]);
+
+      legendSVG
+        .selectAll(".bars")
+        .data(d3.range(legendHeight), function(d) {
+          return d;
+        })
+        .enter()
+        .append("rect")
+        .attr("class", "bars")
+        .attr("y", function(d, i) {
+          return i;
+        })
+        .attr("x", 0)
+        .attr("width", 30)
+        .attr("height", 1)
+        .style("fill", function(d, i) {
+          return legendColorScale(d);
+        });
+    }
   }
 
   // Utilities
@@ -331,17 +368,6 @@ function heatmapChartViz(option) {
         return d3.mean(v, v => v[col]);
       case "count":
         return v.length;
-      default:
-        break;
-    }
-  }
-
-  function sortBars(sortOrder) {
-    switch (sortOrder) {
-      case "atoz":
-        return d3.ascending;
-      case "ztoa":
-        return d3.descending;
       default:
         break;
     }

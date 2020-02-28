@@ -14,6 +14,7 @@
 .heatmap-chart-viz .value-label {
   font-weight: bold;
   text-anchor: middle;
+  vertical-align: middle;
 }
 
 .axis-label {
